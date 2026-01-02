@@ -5,10 +5,27 @@ interface Expense {
   value: number;
 }
 
+interface Report {
+  id: string;
+  name: string;
+  createdAt: number;
+  data: {
+    income: number;
+    expenses: Expense[];
+  };
+}
+
+interface State {
+  income: number;
+  expenses: Expense[];
+  reports: Report[];
+}
+
 export const useFinanceStore = defineStore("finance", {
-  state: () => ({
+  state: (): State => ({
     income: 0 as number,
     expenses: [] as Expense[],
+    reports: [] as Report[],
   }),
 
   getters: {
@@ -21,21 +38,25 @@ export const useFinanceStore = defineStore("finance", {
 
   actions: {
     load() {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const data = localStorage.getItem("finance");
         if (data) {
-          Object.assign(this, JSON.parse(data));
+          const parsed = JSON.parse(data);
+          this.income = parsed.income || 0;
+          this.expenses = parsed.expenses || [];
+          this.reports = parsed.reports || [];
         }
       }
     },
 
     save() {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         localStorage.setItem(
           "finance",
           JSON.stringify({
             income: this.income,
             expenses: this.expenses,
+            reports: this.reports,
           })
         );
       }
@@ -46,7 +67,7 @@ export const useFinanceStore = defineStore("finance", {
       this.save();
     },
 
-    addExpense(expense: { name: string; value: number; }) {
+    addExpense(expense: Expense) {
       this.expenses.push(expense);
       this.save();
     },
@@ -54,6 +75,42 @@ export const useFinanceStore = defineStore("finance", {
     removeExpense(index: number) {
       this.expenses.splice(index, 1);
       this.save();
+    },
+
+    // Funções para relatórios
+    saveReport(name: string) {
+      const report: Report = {
+        id: Date.now().toString(),
+        name: name,
+        createdAt: Date.now(),
+        data: {
+          income: this.income,
+          expenses: [...this.expenses]
+        }
+      };
+      
+      this.reports.push(report);
+      this.save();
+    },
+
+    clearData() {
+      this.income = 0;
+      this.expenses = [];
+      this.save();
+    },
+
+    loadFromReport(reportData: { income: number; expenses: Expense[] }) {
+      this.income = reportData.income;
+      this.expenses = [...reportData.expenses];
+      this.save();
+    },
+
+    deleteReport(reportId: string) {
+      const index = this.reports.findIndex(r => r.id === reportId);
+      if (index !== -1) {
+        this.reports.splice(index, 1);
+        this.save();
+      }
     },
   },
 });
