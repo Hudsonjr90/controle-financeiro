@@ -1,0 +1,102 @@
+@import './quasar-variable.sass'
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700&display=swap')
+*
+    font-family: "Poppins", sans-serif
+    font-size: 14px
+    font-weight: 500
+.wrapper
+    max-width: 1200px
+    margin: 0 auto
+
+.q-field__bottom
+    padding: 5px 5px 0
+
+.backdrop-blur
+    backdrop-filter: blur( 12px )
+    -webkit-backdrop-filter: blur( 12px )
+
+.link-decoration-none
+    color: $primary
+    text-transform: none
+    font-weight: 500
+    text-decoration: none
+    padding: 5px
+    cursor: pointer
+
+.q-menu
+    box-shadow: none
+    border: 1px solid $grey-2
+
+.q-checkbox__bg
+    border-radius: 4px
+
+.q-checkbox__inner--truthy
+    color: $primary !important
+
+$colors: (default: $default, primary: $primary, primary-light: $primary-light, secondary: $secondary, accent: $accent, positive: $positive, negative: $negative, info: $info, warning: $warning, grey-1: $grey-1, grey-2: $grey-2)
+
+@each $color-name, $color-value in $colors
+    .bg-#{$color-name}
+        background-color: $color-value !important
+
+    .hover-bg-#{$color-name}
+        &:hover
+            background-color: $color-value !important
+
+    .text-#{$color-name}
+        color: $color-value !important
+
+    .hover-text-#{$color-name}
+        &:hover
+            color: $color-value !important
+
+    .border-#{$color-name}
+        border-color: $color-value !important
+        border-style: solid !important
+
+    .hover-border-#{$color-name}
+        &:hover
+            border-color: $color-value !important
+            border-style: solid !important
+
+@each $border-size in (1, 2, 3, 4, 5)
+    .border-#{$border-size}
+        border-width: #{$border-size}px !important
+        border-style: solid !important
+
+    .hover-border-#{$border-size}
+        &:hover
+            border-width: #{$border-size}px !important
+            border-style: solid !important
+
+.q-field--outlined .q-field__control:before
+    border-color: $grey-2 !important
+
+.no-bg-image
+    background-image: none !important
+
+.product-card
+    min-height: 140px
+    height: 100%
+    display: flex
+    flex-direction: column
+    z-index: 1
+
+.product-image
+    mix-blend-mode: multiply !important
+
+.link-decoration-none
+    color: $primary-light
+    text-transform: none
+    font-weight: 500
+    text-decoration: none
+    padding: 5px
+    cursor: pointer
+
+.q-tabs__arrow,  .q-expansion-item__toggle-icon
+    color: $primary-dark !important
+
+.q-field__bottom
+    padding: 2px 2px 0
+    &.q-field__messages > div
+        font-size: 8px !important
