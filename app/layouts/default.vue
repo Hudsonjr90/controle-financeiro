@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat dense round icon="menu" @click="drawer = !drawer" />
+        <q-btn flat dense unelevated round icon="fa-solid fa-bars-staggered" @click="drawer = !drawer" />
         <q-toolbar-title>Controle Financeiro</q-toolbar-title>
       </q-toolbar>
     </q-header>

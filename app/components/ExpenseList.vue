@@ -4,12 +4,12 @@
       <q-item-section>{{ item.name }}</q-item-section>
 
       <q-item-section side>
-        R$ {{ item.value.toFixed(2) }}
+        {{ numberToReal(item.value) }}
       </q-item-section>
 
       <q-item-section side>
         <q-btn
-          icon="delete"
+          icon="far fa-trash-alt"
           color="negative"
           flat
           round
@@ -25,5 +25,6 @@
 
 <script setup lang="ts">
 import { useFinanceStore } from "@/stores/finance";
+import { numberToReal } from "@/utils/functions";
 const store = useFinanceStore();
 </script>
