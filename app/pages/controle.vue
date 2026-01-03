@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md" :class="ui.dark ? 'bg-dark' : 'bg-light'">
     <div class="row q-mb-md">
       <div class="col">
         <h4 class="text-h4 q-my-md">Criar Controle Financeiro</h4>
@@ -109,6 +109,7 @@ import FinanceSummary from "@/components/FinanceSummary.vue";
 
 const $q = useQuasar();
 const store = useFinanceStore();
+const ui = useUIStore();
 
 const showSaveDialog = ref(false);
 const nomeRelatorio = ref("");

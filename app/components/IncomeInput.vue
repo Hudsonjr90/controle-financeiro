@@ -1,6 +1,6 @@
 <template>
   <q-input
-    v-model.number="store.income"
+    v-model="store.income"
     label="Renda mensal (R$)"
     type="number"
     filled

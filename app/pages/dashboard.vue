@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md" :class="uiStore.dark ? 'bg-dark' : 'bg-light'">
     <div class="row q-mb-md">
       <div class="col">
         <h4 class="text-h4 q-my-md">Dashboard Financeiro</h4>

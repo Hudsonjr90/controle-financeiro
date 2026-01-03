@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md" :class="ui.dark ? 'bg-dark' : 'bg-light'">
     <div class="row q-mb-md">
       <div class="col">
         <h4 class="text-h4 q-my-md">Meus Relatórios</h4>
@@ -19,7 +19,7 @@
         <q-btn color="primary" to="/controle" label="Criar Primeiro Controle" />
       </div>
 
-      <div v-else>
+      <div v-else >
         <div class="row q-gutter-md">
           <div 
             v-for="(report, index) in store.reports" 
@@ -163,10 +163,12 @@ import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { useFinanceStore } from "@/stores/finance";
 import { formatDate, numberToReal } from "@/utils/functions";
+import { use } from "echarts/types/src/extension.js";
 
 const $q = useQuasar();
 const router = useRouter();
 const store = useFinanceStore();
+const ui = useUIStore();
 
 const showReportDialog = ref(false);
 const selectedReport = ref<any>(null);

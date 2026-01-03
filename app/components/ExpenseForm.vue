@@ -19,7 +19,7 @@
     />
     
     <q-input
-      v-model.number="value"
+      v-model="value"
       label="Valor (R$)"
       type="number"
       step="0.01"

@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header unelevated bordered :class="ui.dark ? 'bg-primary text-white' : 'bg-light text-white'">
+    <q-header unelevated bordered :class="ui.dark ? 'bg-dark' : 'bg-primary'">
       <q-toolbar>
         <q-btn
           flat
@@ -22,10 +22,9 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="drawer" show-if-above bordered>
+    <q-drawer v-model="drawer" show-if-above bordered :class="ui.dark ? 'bg-dark' : 'bg-light'"> 
       <q-list>
-        <q-item-label header class="text-weight-bold">Menu Principal</q-item-label>
-        
+        <q-item-label header class="text-weight-bold">Menu Principal</q-item-label>       
         <q-item clickable to="/" exact @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-house" />
@@ -49,8 +48,7 @@
         
         <q-separator class="q-my-md" />
         
-        <q-item-label header class="text-weight-bold">Relatórios</q-item-label>
-        
+        <q-item-label header class="text-weight-bold">Relatórios</q-item-label> 
         <q-item clickable to="/relatorios" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-file-alt" />
