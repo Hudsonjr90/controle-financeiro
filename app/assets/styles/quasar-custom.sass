@@ -33,7 +33,7 @@
 .q-checkbox__inner--truthy
     color: $primary !important
 
-$colors: (default: $default, primary: $primary, primary-light: $primary-light, secondary: $secondary, secondary-dark: $secondary-dark  accent: $accent, positive: $positive, negative: $negative, info: $info, warning: $warning, grey-1: $grey-1, grey-2: $grey-2)
+$colors: (default: $default, primary: $primary, primary-light: $primary-light, secondary: $secondary, secondary-dark: $secondary-dark, accent: $accent, positive: $positive, negative: $negative, info: $info, warning: $warning, grey-1: $grey-1, grey-2: $grey-2)
 
 @each $color-name, $color-value in $colors
     .bg-#{$color-name}
@@ -100,3 +100,18 @@ $colors: (default: $default, primary: $primary, primary-light: $primary-light, s
     padding: 2px 2px 0
     &.q-field__messages > div
         font-size: 8px !important
+
+// Cores para itens ativos do menu
+body.body--light .q-item.q-router-link--active
+    background-color: rgba($primary, 0.15) !important
+    color: $primary !important
+    
+    .q-icon
+        color: $primary !important
+
+body.body--dark .q-item.q-router-link--active
+    background-color: rgba($primary-light, 0.15) !important
+    color: $primary-light !important
+    
+    .q-icon
+        color: $primary-light !important

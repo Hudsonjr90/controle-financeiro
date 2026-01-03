@@ -32,7 +32,7 @@
                   <div class="col">
                     <div class="text-h6">{{ report.name }}</div>
                     <div class="text-caption text-grey-6">
-                      {{ formatarData(report.createdAt) }}
+                      {{ formatDate(report.createdAt) }}
                     </div>
                   </div>
                 </div>
@@ -47,12 +47,12 @@
                   </div>
                   <div class="col">
                     <div class="text-body2 text-negative">
-                      Gastos: R$ {{ calcularTotalGastos(report.data.expenses) }}
+                      Gastos: {{ numberToReal(calcularTotalGastos(report.data.expenses)) }}
                     </div>
                   </div>
                 </div>
                 <div class="text-body2 q-mt-sm" :class="calcularSaldo(report.data) >= 0 ? 'text-positive' : 'text-negative'">
-                  Saldo: R$ {{ calcularSaldo(report.data).toFixed(2) }}
+                  Saldo: {{ numberToReal(calcularSaldo(report.data)) }}
                 </div>
               </q-card-section>
             </q-card>
@@ -78,12 +78,12 @@
               <div class="row q-gutter-md">
                 <div class="col-auto">
                   <q-chip color="positive" text-color="white" icon="fa-solid fa-dollar-sign">
-                    Renda: R$ {{ selectedReport.data.income.toFixed(2) }}
+                    Renda: {{ numberToReal(selectedReport.data.income) }}
                   </q-chip>
                 </div>
                 <div class="col-auto">
                   <q-chip color="negative" text-color="white" icon="fa-solid fa-receipt">
-                    Gastos: R$ {{ calcularTotalGastos(selectedReport.data.expenses).toFixed(2) }}
+                    Gastos: {{ numberToReal(calcularTotalGastos(selectedReport.data.expenses)) }}
                   </q-chip>
                 </div>
                 <div class="col-auto">
@@ -92,7 +92,7 @@
                     text-color="white" 
                     icon="fa-solid fa-wallet"
                   >
-                    Saldo: R$ {{ calcularSaldo(selectedReport.data).toFixed(2) }}
+                    Saldo: {{ numberToReal(calcularSaldo(selectedReport.data)) }}
                   </q-chip>
                 </div>
               </div>
@@ -104,7 +104,7 @@
               <q-list bordered separator>
                 <q-item v-for="(expense, index) in selectedReport.data.expenses" :key="index">
                   <q-item-section>{{ expense.name }}</q-item-section>
-                  <q-item-section side>R$ {{ expense.value.toFixed(2) }}</q-item-section>
+                  <q-item-section side>{{ numberToReal(expense.value) }}</q-item-section>
                 </q-item>
                 <q-item v-if="selectedReport.data.expenses.length === 0">
                   <q-item-section class="text-grey-6">Nenhum gasto informado</q-item-section>
@@ -124,29 +124,30 @@
           />
           <q-btn 
             flat 
-            color="info" 
+            color="primary-dark" 
             icon="fa-solid fa-file-pdf" 
             label="Baixar PDF" 
             @click="baixarPDFRelatorio"
           />
           <q-btn 
             flat 
-            color="secondary" 
+            color="primary-dark" 
             icon="fa-solid fa-file-csv" 
             label="Baixar CSV" 
             @click="baixarCSVRelatorio"
           />
           <q-btn 
             flat 
-            color="warning" 
+            color="primary-dark" 
             icon="fa-solid fa-pen" 
             label="Editar" 
             @click="carregarDadosRelatorio"
           />
-          <q-btn 
-            color="primary" 
+          <q-btn   
             icon="fa-solid fa-xmark" 
             label="Fechar" 
+            outline
+            class="bg-primary text-white"
             @click="showReportDialog = false"
           />
         </q-card-actions>
@@ -161,6 +162,7 @@ import { ref, onMounted } from "vue";
 import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { useFinanceStore } from "@/stores/finance";
+import { formatDate, numberToReal } from "@/utils/functions";
 
 const $q = useQuasar();
 const router = useRouter();
@@ -173,15 +175,7 @@ onMounted(() => {
   store.load();
 });
 
-function formatarData(timestamp: number) {
-  return new Date(timestamp).toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
+
 
 function calcularTotalGastos(expenses: any[]) {
   return expenses.reduce((sum, expense) => sum + expense.value, 0);
@@ -258,7 +252,7 @@ function baixarCSVRelatorio() {
   const report = selectedReport.value;
   const csvContent = [
     ['Relatório', report.name],
-    ['Data de Criação', formatarData(report.createdAt)],
+    ['Data de Criação', formatDate(report.createdAt)],
     [''],
     ['Tipo', 'Descrição', 'Valor'],
     ['Renda', 'Renda Mensal', report.data.income.toFixed(2)],

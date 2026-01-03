@@ -9,4 +9,15 @@ export default defineNuxtConfig({
   build: {
     transpile: ["quasar"],
   },
+  css: ["@/assets/styles/quasar-custom.sass"],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        sass: {
+          quietDeps: true,
+          silenceDeprecations: ["import"], 
+        },
+      },
+    },
+  },
 })

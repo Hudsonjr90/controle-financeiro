@@ -48,10 +48,12 @@
 
     <!-- COLUNA DIREITA -->
     <div class="col-12 col-md-6">
-      <q-card class="q-pa-md">
+      <q-card class="q-pa-md" style="max-height: 610px;">
         <q-card-section>
           <h6 class="text-h6 q-mt-none">Lista de Gastos</h6>
-          <ExpenseList />
+          <div style="max-height: 460px; overflow-y: auto;">
+            <ExpenseList />
+          </div>
         </q-card-section>
       </q-card>
     </div>

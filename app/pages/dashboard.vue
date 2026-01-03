@@ -16,7 +16,7 @@
           :disable="!temDados"
         />
         <q-btn
-          color="secondary"
+          color="primary"
           icon="fa-solid fa-file-csv"
           label="Exportar CSV"
           @click="exportarCSV"
