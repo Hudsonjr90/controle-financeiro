@@ -4,5 +4,10 @@ export const expenseCategories = [
   "Transporte",
   "Lazer",
   "Educação",
+  "Saúde",
+  "Vestuário",
+  "Serviços Públicos",
+  "Impostos",
+  "Assinaturas",
   "Outros",
 ];

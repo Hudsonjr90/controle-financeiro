@@ -10,14 +10,14 @@
       <div class="col-auto q-gutter-sm">
         <q-btn
           color="primary"
-          icon="picture_as_pdf"
+          icon="fa-solid fa-file-pdf"
           label="Gerar PDF"
           @click="gerarPDF"
           :disable="!temDados"
         />
         <q-btn
           color="secondary"
-          icon="file_download"
+          icon="fa-solid fa-file-csv"
           label="Exportar CSV"
           @click="exportarCSV"
           :disable="!temDados"
@@ -27,7 +27,7 @@
 
     <client-only>
       <div v-if="!temDados" class="text-center q-pa-xl">
-        <q-icon name="analytics" size="4em" class="text-grey-5 q-mb-md" />
+        <q-icon name="fa-solid fa-file-alt" :color="uiStore.dark ? 'white' : 'primary'" size="4em" class="q-mb-md" />
         <h6 class="text-h6 text-grey-6">Nenhum dado disponível</h6>
         <p class="text-body2 text-grey-5 q-mb-lg">
           Adicione informações de renda e gastos para visualizar os gráficos.
@@ -36,13 +36,21 @@
       </div>
 
       <div v-else>
+        <!-- Indicador da fonte dos dados -->
+        <div v-if="dadosParaExibir.fonte === 'relatorio'" class="q-mb-md">
+          <q-banner class="bg-info text-white">
+            <q-icon name="fa-solid fa-info" :color="uiStore.dark ? 'white' : 'primary'" class="q-mr-sm" />
+            Exibindo dados do relatório: <strong>{{ dadosParaExibir.nomeRelatorio }}</strong>
+          </q-banner>
+        </div>
+        
         <!-- Cartões de resumo -->
         <div class="row q-gutter-md q-mb-xl">
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon name="account_balance_wallet" size="2em" class="text-positive" />
-                <div class="text-h6 q-mt-sm">R$ {{ store.income.toFixed(2) }}</div>
+                <q-icon name="fa-solid fa-dollar-sign" size="2em" class="text-positive" />
+                <div class="text-h6 q-mt-sm">{{ (numberToReal(dadosParaExibir.income)) }}</div>
                 <div class="text-caption text-grey-6">Renda Total</div>
               </q-card-section>
             </q-card>
@@ -51,8 +59,8 @@
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon name="receipt_long" size="2em" class="text-negative" />
-                <div class="text-h6 q-mt-sm">R$ {{ store.totalExpenses.toFixed(2) }}</div>
+                <q-icon name="fa-solid fa-receipt" size="2em" class="text-negative" />
+                <div class="text-h6 q-mt-sm">{{ (numberToReal(totalGastos)) }}</div>
                 <div class="text-caption text-grey-6">Gastos Total</div>
               </q-card-section>
             </q-card>
@@ -62,15 +70,15 @@
             <q-card class="text-center">
               <q-card-section>
                 <q-icon 
-                  :name="store.remaining >= 0 ? 'trending_up' : 'trending_down'" 
+                  :name="saldoCalculado >= 0 ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'" 
                   size="2em" 
-                  :class="store.remaining >= 0 ? 'text-positive' : 'text-negative'" 
+                  :class="saldoCalculado >= 0 ? 'text-positive' : 'text-negative'" 
                 />
                 <div 
                   class="text-h6 q-mt-sm"
-                  :class="store.remaining >= 0 ? 'text-positive' : 'text-negative'"
+                  :class="saldoCalculado >= 0 ? 'text-positive' : 'text-negative'"
                 >
-                  R$ {{ store.remaining.toFixed(2) }}
+                  {{ numberToReal(saldoCalculado) }}
                 </div>
                 <div class="text-caption text-grey-6">Saldo</div>
               </q-card-section>
@@ -80,9 +88,9 @@
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon name="percent" size="2em" class="text-info" />
-                <div class="text-h6 q-mt-sm">{{ percentualGasto }}%</div>
-                <div class="text-caption text-grey-6">% da Renda Gasta</div>
+                <q-icon name="fa-solid fa-percent" size="2em" class="text-info" />
+                <div class="text-h6 q-mt-sm">{{ percentualGasto }} %</div>
+                <div class="text-caption text-grey-6">da Renda Gasta</div>
               </q-card-section>
             </q-card>
           </div>
@@ -118,10 +126,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useFinanceStore } from "@/stores/finance";
-// @ts-ignore
+import { useUIStore } from "@/stores/ui";
+import { numberToReal } from "@/utils/functions";
 import VChart from "vue-echarts";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
@@ -133,7 +142,6 @@ import {
   GridComponent 
 } from "echarts/components";
 
-// Registrar componentes do ECharts
 use([
   CanvasRenderer,
   PieChart,
@@ -146,111 +154,201 @@ use([
 
 const $q = useQuasar();
 const store = useFinanceStore();
+const uiStore = useUIStore();
 
-// Computed para verificar se há dados
 const temDados = computed(() => {
-  return store.income > 0 || store.expenses.length > 0;
+  const temDadosAtuais = store.income > 0 || store.expenses.length > 0;
+
+  const temRelatorios = store.reports && store.reports.length > 0;
+  
+  return temDadosAtuais || temRelatorios;
 });
 
-// Percentual gasto da renda
+const dadosParaExibir = computed(() => {
+  const temDadosAtuais = store.income > 0 || store.expenses.length > 0;
+  
+  if (temDadosAtuais) {
+    return {
+      income: store.income,
+      expenses: store.expenses,
+      fonte: 'atual'
+    };
+  } else if (store.reports && store.reports.length > 0) {
+    const ultimoRelatorio = store.reports[store.reports.length - 1];
+    if (ultimoRelatorio) {
+      return {
+        income: ultimoRelatorio.data.income,
+        expenses: ultimoRelatorio.data.expenses,
+        fonte: 'relatorio',
+        nomeRelatorio: ultimoRelatorio.name
+      };
+    }
+  }
+  
+  return { income: 0, expenses: [], fonte: 'nenhum' };
+});
+
+const totalGastos = computed(() => {
+  return dadosParaExibir.value.expenses.reduce((sum: number, expense: any) => sum + expense.value, 0);
+});
+
+const saldoCalculado = computed(() => {
+  return dadosParaExibir.value.income - totalGastos.value;
+});
+
 const percentualGasto = computed(() => {
-  if (store.income === 0) return 0;
-  return Math.round((store.totalExpenses / store.income) * 100);
+  if (dadosParaExibir.value.income === 0) return 0;
+  return Math.round((totalGastos.value / dadosParaExibir.value.income) * 100);
 });
 
-// Configuração do gráfico de pizza (gastos)
-const pieChartOption = computed(() => ({
-  title: {
-    text: 'Gastos por Categoria',
-    left: 'center'
-  },
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b}: R$ {c} ({d}%)'
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'left'
-  },
-  series: [
-    {
-      name: 'Gastos',
-      type: 'pie',
-      radius: '50%',
-      data: store.expenses.map(expense => ({
-        value: expense.value,
-        name: expense.name
-      })),
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
-        }
-      }
-    }
-  ]
-}));
 
-// Configuração do gráfico de barras (comparativo)
-const barChartOption = computed(() => ({
-  title: {
-    text: 'Renda vs Gastos',
-    left: 'center'
-  },
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'shadow'
-    },
-    formatter: 'R$ {c}'
-  },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category',
-    data: ['Renda', 'Gastos', 'Saldo']
-  },
-  yAxis: {
-    type: 'value',
-    axisLabel: {
-      formatter: 'R$ {value}'
+const pieChartOption = computed(() => {
+  const isDark = uiStore.dark;
+  const textColor = isDark ? '#fff' : '#000000';
+  
+  const gastosAgrupados = dadosParaExibir.value.expenses.reduce((acc: any, expense: any) => {
+    const categoria = expense.category || 'Outros';
+    if (acc[categoria]) {
+      acc[categoria] += expense.value;
+    } else {
+      acc[categoria] = expense.value;
     }
-  },
-  series: [
-    {
-      name: 'Valor',
-      type: 'bar',
-      data: [
-        {
-          value: store.income,
-          itemStyle: { color: '#21ba45' }
-        },
-        {
-          value: store.totalExpenses,
-          itemStyle: { color: '#f44336' }
-        },
-        {
-          value: store.remaining,
-          itemStyle: { 
-            color: store.remaining >= 0 ? '#21ba45' : '#f44336' 
+    return acc;
+  }, {});
+  
+  // Converte o objeto agrupado em array para o gráfico
+  const dadosGrafico = Object.entries(gastosAgrupados).map(([categoria, valor]) => ({
+    value: valor,
+    name: categoria
+  }));
+  
+  return {
+    title: {
+      text: 'Gastos por Categoria',
+      left: 'center',
+      textStyle: {
+        color: textColor
+      }
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: R$ {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      textStyle: {
+        color: textColor
+      }
+    },
+    series: [
+      {
+        name: 'Gastos',
+        type: 'pie',
+        radius: '50%',
+        data: dadosGrafico,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
         }
-      ]
-    }
-  ]
-}));
+      }
+    ]
+  };
+});
+
+
+const barChartOption = computed(() => {
+  const isDark = uiStore.dark;
+  const textColor = isDark ? '#ffffff' : '#000000';
+  const gridLineColor = isDark ? '#444444' : '#e6e6e6';
+  
+  return {
+    title: {
+      text: 'Renda vs Gastos',
+      left: 'center',
+      textStyle: {
+        color: textColor
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      formatter: 'R$ {c}'
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: ['Renda', 'Gastos', 'Saldo'],
+      axisLabel: {
+        color: textColor
+      },
+      axisLine: {
+        lineStyle: {
+          color: textColor
+        }
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: 'R$ {value}',
+        color: textColor
+      },
+      axisLine: {
+        lineStyle: {
+          color: textColor
+        }
+      },
+      splitLine: {
+        lineStyle: {
+          color: gridLineColor
+        }
+      }
+    },
+    series: [
+      {
+        name: 'Valor',
+        type: 'bar',
+        data: [
+          {
+            value: dadosParaExibir.value.income,
+            itemStyle: { color: '#21ba45' }
+          },
+          {
+            value: totalGastos.value,
+            itemStyle: { color: '#f44336' }
+          },
+          {
+            value: saldoCalculado.value,
+            itemStyle: { 
+              color: saldoCalculado.value >= 0 ? '#21ba45' : '#f44336' 
+            }
+          }
+        ]
+      }
+    ]
+  };
+});
 
 onMounted(() => {
   store.load();
+  uiStore.load($q);
 });
 
+watch(() => uiStore.dark, () => {
+}, { immediate: true });
+
 function gerarPDF() {
-  // Implementação básica - pode ser expandida
   $q.notify({
     type: 'info',
     message: 'Funcionalidade de PDF em desenvolvimento...',
@@ -261,12 +359,13 @@ function gerarPDF() {
 function exportarCSV() {
   if (!temDados.value) return;
   
+  const dados = dadosParaExibir.value;
   const csvContent = [
     ['Tipo', 'Descrição', 'Valor'],
-    ['Renda', 'Renda Mensal', store.income.toFixed(2)],
-    ...store.expenses.map(expense => ['Gasto', expense.name, expense.value.toFixed(2)]),
-    ['', 'Total Gastos', store.totalExpenses.toFixed(2)],
-    ['', 'Saldo', store.remaining.toFixed(2)]
+    ['Renda', 'Renda Mensal', numberToReal(dados.income)],
+    ...dados.expenses.map((expense: any) => ['Gasto', expense.name, numberToReal(expense.value)]),
+    ['', 'Total Gastos', numberToReal(totalGastos.value)],
+    ['', 'Saldo', numberToReal(saldoCalculado.value)]
   ]
   .map(row => row.join(','))
   .join('\n');
@@ -275,7 +374,12 @@ function exportarCSV() {
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);
-  link.setAttribute('download', `relatorio_financeiro_${new Date().toISOString().split('T')[0]}.csv`);
+  
+  const filename = dados.fonte === 'relatorio' 
+    ? `dashboard_${dados.nomeRelatorio?.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
+    : `dashboard_${new Date().toISOString().split('T')[0]}.csv`;
+    
+  link.setAttribute('download', filename);
   link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();

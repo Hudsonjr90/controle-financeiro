@@ -11,7 +11,7 @@
 
     <client-only>
       <div v-if="store.reports.length === 0" class="text-center q-pa-xl">
-        <q-icon name="assessment" size="4em" class="text-grey-5 q-mb-md" />
+        <q-icon name="fa-solid fa-file-lines" size="4em" class="text-grey-5 q-mb-md" />
         <h6 class="text-h6 text-grey-6">Nenhum relatório salvo</h6>
         <p class="text-body2 text-grey-5 q-mb-lg">
           Crie um controle financeiro e salve como relatório para visualizar aqui.
@@ -35,14 +35,6 @@
                       {{ formatarData(report.createdAt) }}
                     </div>
                   </div>
-                  <div class="col-auto">
-                    <q-btn
-                      flat
-                      round
-                      icon="fa-solid fa-ellipsis-vertical"
-                      @click.stop="mostrarMenuRelatorio(report, $event)"
-                    />
-                  </div>
                 </div>
               </q-card-section>
 
@@ -50,12 +42,12 @@
                 <div class="row q-gutter-sm">
                   <div class="col">
                     <div class="text-body2 text-positive">
-                      Renda: R$ {{ report.data.income.toFixed(2) }}
+                      Renda: R$ {{ report.data.income }}
                     </div>
                   </div>
                   <div class="col">
                     <div class="text-body2 text-negative">
-                      Gastos: R$ {{ calcularTotalGastos(report.data.expenses).toFixed(2) }}
+                      Gastos: R$ {{ calcularTotalGastos(report.data.expenses) }}
                     </div>
                   </div>
                 </div>
@@ -122,38 +114,45 @@
           </div>
         </q-card-section>
 
-        <q-card-actions align="right" class="q-pa-lg">
-          <q-btn flat label="Fechar" @click="showReportDialog = false" />
+        <q-card-actions align="right" class="q-pa-lg q-gutter-sm">
+          <q-btn 
+            flat 
+            color="negative" 
+            icon="fa-solid fa-trash" 
+            label="Excluir" 
+            @click="excluirRelatorio"
+          />
+          <q-btn 
+            flat 
+            color="info" 
+            icon="fa-solid fa-file-pdf" 
+            label="Baixar PDF" 
+            @click="baixarPDFRelatorio"
+          />
+          <q-btn 
+            flat 
+            color="secondary" 
+            icon="fa-solid fa-file-csv" 
+            label="Baixar CSV" 
+            @click="baixarCSVRelatorio"
+          />
+          <q-btn 
+            flat 
+            color="warning" 
+            icon="fa-solid fa-pen" 
+            label="Editar" 
+            @click="carregarDadosRelatorio"
+          />
           <q-btn 
             color="primary" 
-            label="Carregar Dados" 
-            @click="carregarDadosRelatorio"
+            icon="fa-solid fa-xmark" 
+            label="Fechar" 
+            @click="showReportDialog = false"
           />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <!-- Menu de ações do relatório -->
-    <q-menu
-      ref="menuRef"
-      anchor="center right"
-      self="center left"
-    >
-      <q-list style="min-width: 100px">
-        <q-item clickable @click="carregarDadosRelatorio">
-          <q-item-section avatar>
-            <q-icon name="fa-solid fa-pen" />
-          </q-item-section>
-          <q-item-section>Editar Dados</q-item-section>
-        </q-item>
-        <q-item clickable @click="excluirRelatorio">
-          <q-item-section avatar>
-            <q-icon name="fa-solid fa-trash" />
-          </q-item-section>
-          <q-item-section>Excluir</q-item-section>
-        </q-item>
-      </q-list>
-    </q-menu>
   </q-page>
 </template>
 
@@ -169,7 +168,6 @@ const store = useFinanceStore();
 
 const showReportDialog = ref(false);
 const selectedReport = ref<any>(null);
-const menuRef = ref();
 
 onMounted(() => {
   store.load();
@@ -198,26 +196,24 @@ function visualizarRelatorio(report: any) {
   showReportDialog.value = true;
 }
 
-function mostrarMenuRelatorio(report: any, event: Event) {
-  selectedReport.value = report;
-  menuRef.value.show();
-}
-
 function carregarDadosRelatorio() {
   if (!selectedReport.value) return;
 
   $q.dialog({
-    title: 'Carregar Dados',
-    message: 'Isso irá substituir os dados atuais pelos dados do relatório. Deseja continuar?',
+    title: 'Editar Relatório',
+    message: `Deseja editar o relatório "${selectedReport.value.name}"? Os dados serão carregados na página de controle para edição.`,
     cancel: true,
     persistent: true
   }).onOk(() => {
-    store.loadFromReport(selectedReport.value.data);
+    store.loadFromReport(selectedReport.value.data, { 
+      id: selectedReport.value.id, 
+      name: selectedReport.value.name 
+    });
     showReportDialog.value = false;
     
     $q.notify({
       type: 'positive',
-      message: 'Dados carregados com sucesso!',
+      message: `Dados do relatório "${selectedReport.value.name}" carregados para edição!`,
       position: 'top'
     });
     
@@ -236,11 +232,58 @@ function excluirRelatorio() {
   }).onOk(() => {
     store.deleteReport(selectedReport.value.id);
     
+    showReportDialog.value = false;
+    
     $q.notify({
       type: 'positive',
       message: 'Relatório excluído com sucesso!',
       position: 'top'
     });
+  });
+}
+
+function baixarPDFRelatorio() {
+  if (!selectedReport.value) return;
+  
+  $q.notify({
+    type: 'info',
+    message: 'Funcionalidade de PDF em desenvolvimento...',
+    position: 'top'
+  });
+}
+
+function baixarCSVRelatorio() {
+  if (!selectedReport.value) return;
+  
+  const report = selectedReport.value;
+  const csvContent = [
+    ['Relatório', report.name],
+    ['Data de Criação', formatarData(report.createdAt)],
+    [''],
+    ['Tipo', 'Descrição', 'Valor'],
+    ['Renda', 'Renda Mensal', report.data.income.toFixed(2)],
+    ...report.data.expenses.map((expense: any) => ['Gasto', expense.name, expense.value.toFixed(2)]),
+    [''],
+    ['', 'Total Gastos', calcularTotalGastos(report.data.expenses).toFixed(2)],
+    ['', 'Saldo', calcularSaldo(report.data).toFixed(2)]
+  ]
+  .map(row => row.join(','))
+  .join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${report.name.replace(/[^a-zA-Z0-9]/g, '_')}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  $q.notify({
+    type: 'positive',
+    message: 'Arquivo CSV baixado com sucesso!',
+    position: 'top'
   });
 }
 </script>
