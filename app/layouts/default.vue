@@ -26,21 +26,21 @@
       <q-list>
         <q-item-label header class="text-weight-bold">Menu Principal</q-item-label>
         
-        <q-item clickable to="/" exact @click="drawer = false" :class="ui.dark ? 'text-accent' : 'text-primary'">
+        <q-item clickable to="/" exact @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-house" />
           </q-item-section>
           <q-item-section >Início</q-item-section>
         </q-item>
         
-        <q-item clickable to="/controle" @click="drawer = false" :class="ui.dark ? 'text-accent' : 'text-primary'">
+        <q-item clickable to="/controle" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-plus-circle" />
           </q-item-section>
           <q-item-section>Criar Controle</q-item-section>
         </q-item>
         
-        <q-item clickable to="/dashboard" @click="drawer = false" :class="ui.dark ? 'text-accent' : 'text-primary'">
+        <q-item clickable to="/dashboard" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-chart-line" />
           </q-item-section>
@@ -51,7 +51,7 @@
         
         <q-item-label header class="text-weight-bold">Relatórios</q-item-label>
         
-        <q-item clickable to="/relatorios" @click="drawer = false" :class="ui.dark ? 'text-accent' : 'text-primary'">
+        <q-item clickable to="/relatorios" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-file-alt" />
           </q-item-section>
