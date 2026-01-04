@@ -162,8 +162,8 @@ import { ref, onMounted } from "vue";
 import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { useFinanceStore } from "@/stores/finance";
+import { useUIStore } from "@/stores/ui";
 import { formatDate, numberToReal } from "@/utils/functions";
-import { use } from "echarts/types/src/extension.js";
 
 const $q = useQuasar();
 const router = useRouter();
