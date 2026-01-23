@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md" :class="ui.dark ? 'bg-dark' : 'bg-light'">
-    <div class="row q-mb-md">
+    <div class="row q-mb-md gt-sm">
       <div class="col">
         <h4 class="text-h4 q-my-md">Criar Controle Financeiro</h4>
         <p class="text-body1 text-grey-7">
@@ -20,14 +20,37 @@
       </div>
     </div>
 
+    <div class="q-mb-md lt-md">
+      <div class="row q-mb-sm">
+        <div class="col-12 col-sm">
+          <h4 class="text-h4 q-my-md">Criar Controle Financeiro</h4>
+        </div>
+        <div class="col-12 col-sm">
+          <p class="text-body1 text-grey-7 q-my-md">
+            Preencha suas informações de renda e gastos para começar o controle
+            financeiro.
+          </p>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-12 col-sm-auto">
+          <q-btn
+            color="positive"
+            icon="fa-solid fa-save"
+            label="Salvar Relatório"
+            @click="salvarRelatorio"
+            :disable="!temDados"
+            class="full-width-xs"
+          />
+        </div>
+      </div>
+    </div>
+
  <client-only>
   <div class="row q-col-gutter-lg items-start">
-
-    <!-- COLUNA ESQUERDA -->
     <div class="col-12 col-md-6">
       <div class="column q-gutter-lg">
-
-        <!-- RENDA -->
         <q-card class="q-pa-md">
           <q-card-section>
             <h6 class="text-h6 q-mt-none">Informações de Renda</h6>
@@ -35,7 +58,6 @@
           </q-card-section>
         </q-card>
 
-        <!-- GASTOS -->
         <q-card class="q-pa-md">
           <q-card-section>
             <h6 class="text-h6 q-mt-none">Adicionar Gastos</h6>
@@ -46,7 +68,6 @@
       </div>
     </div>
 
-    <!-- COLUNA DIREITA -->
     <div class="col-12 col-md-6">
       <q-card class="q-pa-md" style="max-height: 610px;">
         <q-card-section>
@@ -58,7 +79,6 @@
       </q-card>
     </div>
 
-    <!-- RESUMO (100%) -->
     <div class="col-12">
       <q-card class="q-pa-md">
         <q-card-section>
@@ -72,7 +92,6 @@
 </client-only>
 
 
-    <!-- Dialog de confirmação para salvar relatório -->
     <q-dialog v-model="showSaveDialog" persistent>
       <q-card style="min-width: 350px">
         <q-card-section>
@@ -132,8 +151,6 @@ function salvarRelatorio() {
     return;
   }
 
-  // Se está editando um relatório existente, usa o nome original
-  // Senão, define um nome padrão baseado na data
   if (store.editingReport) {
     nomeRelatorio.value = store.editingReport.name;
   } else {
@@ -153,12 +170,9 @@ function confirmarSalvar() {
     });
     return;
   }
-
-  // Salva o relatório (cria novo ou atualiza existente)
   const isEditing = !!store.editingReport;
   store.saveReport(nomeRelatorio.value.trim());
 
-  // Limpa os dados atuais
   store.clearData();
 
   showSaveDialog.value = false;

@@ -177,8 +177,6 @@ onMounted(() => {
   store.load();
 });
 
-
-
 function calcularTotalGastos(expenses: any[]) {
   return expenses.reduce((sum, expense) => sum + expense.value, 0);
 }
@@ -241,11 +239,84 @@ function excluirRelatorio() {
 function baixarPDFRelatorio() {
   if (!selectedReport.value) return;
   
-  $q.notify({
-    type: 'info',
-    message: 'Funcionalidade de PDF em desenvolvimento...',
-    position: 'top'
-  });
+  try {
+    import('jspdf').then(({ jsPDF }) => {
+      const doc = new jsPDF();
+      const report = selectedReport.value;
+      const totalGastos = calcularTotalGastos(report.data.expenses);
+      const saldo = calcularSaldo(report.data);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('Relatório Financeiro', 20, 30);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.text(`Relatório: ${report.name}`, 20, 50);
+      doc.text(`Data de Criação: ${formatDate(report.createdAt)}`, 20, 60);
+      
+      // Resumo financeiro
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('Resumo Financeiro', 20, 80);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.text(`Renda: R$ ${report.data.income.toFixed(2)}`, 20, 95);
+      doc.text(`Total de Gastos: R$ ${totalGastos.toFixed(2)}`, 20, 105);
+      
+      doc.setTextColor(saldo >= 0 ? 0 : 255, saldo >= 0 ? 128 : 0, 0);
+      doc.text(`Saldo: R$ ${saldo.toFixed(2)}`, 20, 115);
+      doc.setTextColor(0, 0, 0); 
+      
+      if (report.data.expenses.length > 0) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text('Detalhamento de Gastos', 20, 135);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        
+        let yPosition = 150;
+        report.data.expenses.forEach((expense: any, index: number) => {
+          if (yPosition > 270) { 
+            doc.addPage();
+            yPosition = 20;
+          }
+          
+          const categoria = expense.category ? ` (${expense.category})` : '';
+          doc.text(`${index + 1}. ${expense.name}${categoria}`, 25, yPosition);
+          doc.text(`R$ ${expense.value.toFixed(2)}`, 160, yPosition);
+          yPosition += 10;
+        });
+      }
+      
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text('Gerado pelo Sistema de Controle Financeiro', 20, 290);
+        doc.text(`Página ${i} de ${pageCount}`, 160, 290);
+      }
+      
+      const fileName = `${report.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      doc.save(fileName);
+      
+      $q.notify({
+        type: 'positive',
+        message: 'Relatório PDF baixado com sucesso!',
+        position: 'top'
+      });
+    });
+  } catch (error) {
+    console.error('Erro ao gerar PDF:', error);
+    $q.notify({
+      type: 'negative',
+      message: 'Erro ao gerar PDF. Tente novamente.',
+      position: 'top'
+    });
+  }
 }
 
 function baixarCSVRelatorio() {

@@ -19,13 +19,13 @@
     />
     
     <q-input
-      v-model="value"
+      v-model="displayValue"
       label="Valor (R$)"
       type="number"
       step="0.01"
       min="0"
       filled
-      class="q-mb-sm"
+      class="q-mb-sm no-spinners"
     />
     
     <q-btn label="Adicionar" color="primary" class="full-width" @click="add" />
@@ -46,14 +46,18 @@ const value = ref(0);
 const category = ref("");
 const categoriaOptions = ref<string[]>([]);
 
-// Categorias das constantes + categorias dos gastos existentes
+const displayValue = computed({
+  get: () => value.value === 0 ? '' : value.value.toString(),
+  set: (val: string) => {
+    value.value = Number(val) || 0;
+  }
+});
+
 const categoriasExistentes = computed(() => {
   const categorias = new Set<string>();
   
-  // Adicionar categorias das constantes
   expenseCategories.forEach(cat => categorias.add(cat));
   
-  // Adicionar categorias dos gastos existentes que não estão nas constantes
   store.expenses.forEach(expense => {
     if (expense.category && expense.category.trim()) {
       categorias.add(expense.category);
@@ -63,7 +67,6 @@ const categoriasExistentes = computed(() => {
   return Array.from(categorias).sort();
 });
 
-// Inicializar opções
 categoriaOptions.value = categoriasExistentes.value;
 
 function filtrarCategorias(val: string, update: Function) {
@@ -106,9 +109,21 @@ function add() {
     position: 'top'
   });
 
-  // Limpar campos
   name.value = "";
   value.value = 0;
   category.value = "";
 }
 </script>
+
+<style scoped>
+.no-spinners :deep(input[type="number"]::-webkit-outer-spin-button),
+.no-spinners :deep(input[type="number"]::-webkit-inner-spin-button) {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinners :deep(input[type="number"]) {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+</style>

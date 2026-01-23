@@ -22,7 +22,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="drawer" show-if-above bordered :class="ui.dark ? 'bg-dark' : 'bg-light'"> 
+    <q-drawer v-model="drawer" bordered :class="ui.dark ? 'bg-dark' : 'bg-light'"> 
       <q-list>
         <q-item-label header class="text-weight-bold">Menu Principal</q-item-label>       
         <q-item clickable to="/" exact @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
