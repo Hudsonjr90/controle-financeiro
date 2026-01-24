@@ -24,9 +24,9 @@
           <div 
             v-for="(report, index) in store.reports" 
             :key="index"
-            class="col-12 col-sm-6 col-lg-4"
+            class="col-12 col-xs-12 col-sm-6 col-lg-4 q-mb-md q-pa-md"
           >
-            <q-card class="cursor-pointer" @click="visualizarRelatorio(report)">
+            <q-card class="cursor-pointer full-width" @click="visualizarRelatorio(report)">
               <q-card-section>
                 <div class="row items-center no-wrap">
                   <div class="col">

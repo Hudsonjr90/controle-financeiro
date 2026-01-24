@@ -5,7 +5,8 @@
     type="number"
     filled
     @update:model-value="handleIncomeUpdate"    
-    class="no-spinners"  
+    class="no-spinners full-width"
+    :dense="$q.screen.lt.md"
     />
 </template>
 

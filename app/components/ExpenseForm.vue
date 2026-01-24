@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-input v-model="name" label="Descrição" filled class="q-mb-sm" />
+    <q-input v-model="name" label="Descrição" filled class="q-mb-sm full-width" />
     
     <q-select
       v-model="category"
@@ -13,7 +13,7 @@
       hide-selected
       input-debounce="0"
       new-value-mode="add-unique"
-      class="q-mb-sm"
+      class="q-mb-sm full-width"
       hint="Digite para criar nova categoria ou selecione existente"
       @filter="filtrarCategorias"
     />
@@ -25,10 +25,10 @@
       step="0.01"
       min="0"
       filled
-      class="q-mb-sm no-spinners"
+      class="q-mb-sm no-spinners full-width"
     />
     
-    <q-btn label="Adicionar" color="primary" class="full-width" @click="add" />
+    <q-btn label="Adicionar" color="primary" class="full-width q-mt-md" @click="add" />
   </div>
 </template>
 

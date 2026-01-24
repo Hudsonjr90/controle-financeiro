@@ -1,6 +1,6 @@
 <template>
-  <q-list bordered separator v-if="store.expenses.length">
-    <q-item v-for="(item, index) in store.expenses" :key="index">
+  <q-list bordered separator v-if="store.expenses.length" class="full-width">
+    <q-item v-for="(item, index) in store.expenses" :key="index" class="full-width">
       <q-item-section>
         <div class="text-body2">{{ item.name }}</div>
         <div v-if="item.category" class="text-caption text-grey-6">
@@ -43,7 +43,7 @@
 
   <!-- Dialog para editar gasto -->
   <q-dialog v-model="showEditDialog" persistent>
-    <q-card style="min-width: 350px">
+    <q-card style="min-width: 300px; max-width: 95vw; width: 100%;">
       <q-card-section>
         <div class="text-h6">Editar Gasto</div>
       </q-card-section>

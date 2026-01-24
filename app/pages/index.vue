@@ -2,12 +2,12 @@
   <q-page class="flex flex-center" :class="uiStore.dark ? 'bg-dark' : 'bg-light'">
     <div class="text-center q-pa-xl">
       <div class="q-mb-xl">
-        <q-img
-          :src="dashboardLogo"
-          style="width: 500px; height: 300px"
-          class="q-mx-auto q-mb-lg"
-          alt="Controle Financeiro"
-        />
+          <q-img
+            :src="dashboardLogo"
+            :style="imgStyle"
+            class="q-mx-auto q-mb-lg"
+            alt="Controle Financeiro"
+          />
       </div>
       
       <h1 class="text-h3 q-mb-md font-weight-bold" :class="uiStore.dark ? 'text-white' : 'text-dark'">
@@ -74,8 +74,13 @@
 <script setup lang="ts">
 import { useUIStore } from "@/stores/ui";
 import { useQuasar } from "quasar";
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import dashboardLogo from "@/assets/images/dashboard.png";
+const imgStyle = computed(() => {
+  return $q.screen.lt.md
+    ? { width: '90vw', maxWidth: '320px', height: '120px' }
+    : { width: '500px', height: '300px' };
+});
 
 const uiStore = useUIStore();
 const $q = useQuasar();

@@ -120,6 +120,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useQuasar } from "quasar";
+import { useRouter } from "vue-router";
 import { useFinanceStore } from "@/stores/finance";
 import IncomeInput from "@/components/IncomeInput.vue";
 import ExpenseForm from "@/components/ExpenseForm.vue";
@@ -127,6 +128,7 @@ import ExpenseList from "@/components/ExpenseList.vue";
 import FinanceSummary from "@/components/FinanceSummary.vue";
 
 const $q = useQuasar();
+const router = useRouter();
 const store = useFinanceStore();
 const ui = useUIStore();
 
@@ -185,5 +187,8 @@ function confirmarSalvar() {
       : "Relatório salvo com sucesso! Os dados foram limpos para um novo controle.",
     position: "top",
   });
+
+  // Redireciona para a tela de relatórios
+  router.push('/relatorios');
 }
 </script>
