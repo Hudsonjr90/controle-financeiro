@@ -9,7 +9,6 @@ import {
 } from "echarts/components";
 
 export default defineNuxtPlugin(() => {
-  // Registrar componentes do ECharts
   use([
     CanvasRenderer,
     PieChart,

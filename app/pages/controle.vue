@@ -183,12 +183,11 @@ function confirmarSalvar() {
   $q.notify({
     type: "positive",
     message: isEditing 
-      ? "Relatório atualizado com sucesso! Os dados foram limpos para um novo controle."
-      : "Relatório salvo com sucesso! Os dados foram limpos para um novo controle.",
+      ? "Relatório atualizado com sucesso!"
+      : "Relatório salvo com sucesso!",
     position: "top",
   });
 
-  // Redireciona para a tela de relatórios
   router.push('/relatorios');
 }
 </script>

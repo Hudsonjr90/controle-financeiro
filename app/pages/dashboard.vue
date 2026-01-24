@@ -348,12 +348,84 @@ onMounted(() => {
 watch(() => uiStore.dark, () => {
 }, { immediate: true });
 
-function gerarPDF() {
-  $q.notify({
-    type: 'info',
-    message: 'Funcionalidade de PDF em desenvolvimento...',
-    position: 'top'
-  });
+async function gerarPDF() {
+  try {
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF();
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('Dashboard Financeiro', 20, 30);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    if (dadosParaExibir.value.fonte === 'relatorio' && dadosParaExibir.value.nomeRelatorio) {
+      doc.text(`Relatório: ${dadosParaExibir.value.nomeRelatorio}`, 20, 45);
+    }
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 55);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('Resumo Financeiro', 20, 75);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(`Renda: ${numberToReal(dadosParaExibir.value.income)}`, 20, 90);
+    doc.text(`Total de Gastos: ${numberToReal(totalGastos.value)}`, 20, 100);
+    doc.setTextColor(saldoCalculado.value >= 0 ? 0 : 255, saldoCalculado.value >= 0 ? 128 : 0, 0);
+    doc.text(`Saldo: ${numberToReal(saldoCalculado.value)}`, 20, 110);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`% da Renda Gasta: ${percentualGasto.value} %`, 20, 120);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.text('Gastos Detalhados', 20, 135);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    let yPosition = 145;
+    if (dadosParaExibir.value.expenses.length > 0) {
+      dadosParaExibir.value.expenses.forEach((expense: any, index: number) => {
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        const categoria = expense.category ? ` (${expense.category})` : '';
+        doc.text(`${index + 1}. ${expense.name}${categoria}`, 25, yPosition);
+        doc.text(`${numberToReal(expense.value)}`, 160, yPosition);
+        yPosition += 10;
+      });
+    } else {
+      doc.text('Nenhum gasto informado', 25, yPosition);
+      yPosition += 10;
+    }
+
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text('Gerado pelo Sistema de Controle Financeiro', 20, 290);
+      doc.text(`Página ${i} de ${pageCount}`, 160, 290);
+    }
+
+    const fileName = dadosParaExibir.value.fonte === 'relatorio' && dadosParaExibir.value.nomeRelatorio
+      ? `${dadosParaExibir.value.nomeRelatorio.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
+      : `${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+
+    $q.notify({
+      type: 'positive',
+      message: 'PDF gerado com sucesso!',
+      position: 'top'
+    });
+  } catch (error) {
+    console.error('Erro ao gerar PDF:', error);
+    $q.notify({
+      type: 'negative',
+      message: 'Erro ao gerar PDF. Tente novamente.',
+      position: 'top'
+    });
+  }
 }
 
 function exportarCSV() {
@@ -376,8 +448,8 @@ function exportarCSV() {
   link.setAttribute('href', url);
   
   const filename = dados.fonte === 'relatorio' 
-    ? `dashboard_${dados.nomeRelatorio?.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
-    : `dashboard_${new Date().toISOString().split('T')[0]}.csv`;
+    ? `${dados.nomeRelatorio?.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
+    : `${new Date().toISOString().split('T')[0]}.csv`;
     
   link.setAttribute('download', filename);
   link.style.visibility = 'hidden';

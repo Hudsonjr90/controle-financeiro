@@ -255,7 +255,6 @@ function baixarPDFRelatorio() {
       doc.text(`Relatório: ${report.name}`, 20, 50);
       doc.text(`Data de Criação: ${formatDate(report.createdAt)}`, 20, 60);
       
-      // Resumo financeiro
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
       doc.text('Resumo Financeiro', 20, 80);
