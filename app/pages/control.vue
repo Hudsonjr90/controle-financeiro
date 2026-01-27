@@ -188,6 +188,6 @@ function confirmarSalvar() {
     position: "top",
   });
 
-  router.push('/relatorios');
+  router.push('/reports');
 }
 </script>

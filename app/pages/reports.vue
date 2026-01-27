@@ -11,7 +11,7 @@
 
     <client-only>
       <div v-if="store.reports.length === 0" class="text-center q-pa-xl">
-        <q-icon name="fa-solid fa-file-lines" size="4em" class="text-grey-5 q-mb-md" />
+        <q-icon name="fa-solid fa-file-alt" :color="ui.dark ? 'white' : 'primary'" size="4em" class="q-mb-md" />
         <h6 class="text-h6 text-grey-6">Nenhum relatório salvo</h6>
         <p class="text-body2 text-grey-5 q-mb-lg">
           Crie um controle financeiro e salve como relatório para visualizar aqui.

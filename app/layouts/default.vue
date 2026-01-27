@@ -32,7 +32,7 @@
           <q-item-section >Início</q-item-section>
         </q-item>
         
-        <q-item clickable to="/controle" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
+        <q-item clickable to="/control" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-plus-circle" />
           </q-item-section>
@@ -49,7 +49,7 @@
         <q-separator class="q-my-md" />
         
         <q-item-label header class="text-weight-bold">Relatórios</q-item-label> 
-        <q-item clickable to="/relatorios" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
+        <q-item clickable to="/reports" @click="drawer = false" :class="ui.dark ? 'text-white' : 'text-primary'">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-file-alt" />
           </q-item-section>

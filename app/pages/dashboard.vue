@@ -7,76 +7,116 @@
           Visualize seus dados financeiros em gráficos interativos.
         </p>
       </div>
-      <div class="col-auto q-gutter-sm">
-        <q-btn
-          color="primary"
-          icon="fa-solid fa-file-pdf"
-          label="Gerar PDF"
-          @click="gerarPDF"
-          :disable="!temDados"
-        />
-        <q-btn
-          color="primary"
-          icon="fa-solid fa-file-csv"
-          label="Exportar CSV"
-          @click="exportarCSV"
-          :disable="!temDados"
-        />
+      <div class="col-auto q-gutter-sm" v-if="temDados && !isMobile">
+      <q-btn
+        color="primary"
+        icon="fa-solid fa-file-pdf"
+        label="Gerar PDF"
+        @click="gerarPDF"
+      />
+      <q-btn
+        color="primary"
+        icon="fa-solid fa-file-csv"
+        label="Exportar CSV"
+        @click="exportarCSV"
+      />
       </div>
+    </div>
+    <div class="col-auto q-gutter-sm q-mb-md" v-if="temDados && isMobile">
+      <q-btn
+        color="primary"
+        icon="fa-solid fa-file-pdf"
+        label="Gerar PDF"
+        @click="gerarPDF"
+      />
+      <q-btn
+        color="primary"
+        icon="fa-solid fa-file-csv"
+        label="Exportar CSV"
+        @click="exportarCSV"
+      />
     </div>
 
     <client-only>
       <div v-if="!temDados" class="text-center q-pa-xl">
-        <q-icon name="fa-solid fa-file-alt" :color="uiStore.dark ? 'white' : 'primary'" size="4em" class="q-mb-md" />
+        <q-icon
+          name="fa-solid fa-file-alt"
+          :color="uiStore.dark ? 'white' : 'primary'"
+          size="4em"
+          class="q-mb-md"
+        />
         <h6 class="text-h6 text-grey-6">Nenhum dado disponível</h6>
         <p class="text-body2 text-grey-5 q-mb-lg">
           Adicione informações de renda e gastos para visualizar os gráficos.
         </p>
-        <q-btn color="primary" to="/controle" label="Criar Controle" />
+        <q-btn color="primary" to="/control" label="Criar Controle" />
       </div>
 
       <div v-else>
-        <!-- Indicador da fonte dos dados -->
         <div v-if="dadosParaExibir.fonte === 'relatorio'" class="q-mb-md">
           <q-banner class="bg-info text-white">
-            <q-icon name="fa-solid fa-info" :color="uiStore.dark ? 'white' : 'primary'" class="q-mr-sm" />
-            Exibindo dados do relatório: <strong>{{ dadosParaExibir.nomeRelatorio }}</strong>
+            <q-icon
+              name="fa-solid fa-info"
+              :color="uiStore.dark ? 'white' : 'primary'"
+              class="q-mr-sm"
+            />
+            Exibindo dados do relatório:
+            <strong>{{ dadosParaExibir.nomeRelatorio }}</strong>
           </q-banner>
         </div>
-        
-        <!-- Cartões de resumo -->
+
         <div class="row q-gutter-md q-mb-xl">
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon name="fa-solid fa-dollar-sign" size="2em" class="text-positive" />
-                <div class="text-h6 q-mt-sm">{{ (numberToReal(dadosParaExibir.income)) }}</div>
+                <q-icon
+                  name="fa-solid fa-dollar-sign"
+                  size="2em"
+                  class="text-positive"
+                />
+                <div class="text-h6 q-mt-sm">
+                  {{ numberToReal(dadosParaExibir.income) }}
+                </div>
                 <div class="text-caption text-grey-6">Renda Total</div>
               </q-card-section>
             </q-card>
           </div>
-          
+
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon name="fa-solid fa-receipt" size="2em" class="text-negative" />
-                <div class="text-h6 q-mt-sm">{{ (numberToReal(totalGastos)) }}</div>
+                <q-icon
+                  name="fa-solid fa-receipt"
+                  size="2em"
+                  class="text-negative"
+                />
+                <div class="text-h6 q-mt-sm">
+                  {{ numberToReal(totalGastos) }}
+                </div>
                 <div class="text-caption text-grey-6">Gastos Total</div>
               </q-card-section>
             </q-card>
           </div>
-          
+
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon 
-                  :name="saldoCalculado >= 0 ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'" 
-                  size="2em" 
-                  :class="saldoCalculado >= 0 ? 'text-positive' : 'text-negative'" 
+                <q-icon
+                  :name="
+                    saldoCalculado >= 0
+                      ? 'fa-solid fa-arrow-trend-up'
+                      : 'fa-solid fa-arrow-trend-down'
+                  "
+                  size="2em"
+                  :class="
+                    saldoCalculado >= 0 ? 'text-positive' : 'text-negative'
+                  "
                 />
-                <div 
+                <div
                   class="text-h6 q-mt-sm"
-                  :class="saldoCalculado >= 0 ? 'text-positive' : 'text-negative'"
+                  :class="
+                    saldoCalculado >= 0 ? 'text-positive' : 'text-negative'
+                  "
                 >
                   {{ numberToReal(saldoCalculado) }}
                 </div>
@@ -84,11 +124,15 @@
               </q-card-section>
             </q-card>
           </div>
-          
+
           <div class="col-12 col-sm-6 col-md-3">
             <q-card class="text-center">
               <q-card-section>
-                <q-icon name="fa-solid fa-percent" size="2em" class="text-info" />
+                <q-icon
+                  name="fa-solid fa-percent"
+                  size="2em"
+                  class="text-info"
+                />
                 <div class="text-h6 q-mt-sm">{{ percentualGasto }} %</div>
                 <div class="text-caption text-grey-6">da Renda Gasta</div>
               </q-card-section>
@@ -96,24 +140,23 @@
           </div>
         </div>
 
-        <!-- Gráficos -->
         <div class="row q-gutter-lg">
           <div class="col-12 col-lg-6">
             <q-card>
               <q-card-section>
                 <h6 class="text-h6 q-mt-none">Distribuição de Gastos</h6>
-                <div style="height: 400px;">
+                <div style="height: 400px">
                   <v-chart :option="pieChartOption" autoresize />
                 </div>
               </q-card-section>
             </q-card>
           </div>
-          
+
           <div class="col-12 col-lg-6">
             <q-card>
               <q-card-section>
                 <h6 class="text-h6 q-mt-none">Comparativo Renda vs Gastos</h6>
-                <div style="height: 400px;">
+                <div style="height: 400px">
                   <v-chart :option="barChartOption" autoresize />
                 </div>
               </q-card-section>
@@ -135,11 +178,11 @@ import VChart from "vue-echarts";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { PieChart, BarChart } from "echarts/charts";
-import { 
-  TitleComponent, 
-  TooltipComponent, 
+import {
+  TitleComponent,
+  TooltipComponent,
   LegendComponent,
-  GridComponent 
+  GridComponent,
 } from "echarts/components";
 
 use([
@@ -149,29 +192,30 @@ use([
   TitleComponent,
   TooltipComponent,
   LegendComponent,
-  GridComponent
+  GridComponent,
 ]);
 
 const $q = useQuasar();
 const store = useFinanceStore();
 const uiStore = useUIStore();
+const isMobile = computed(() => $q.screen.lt.md);
 
 const temDados = computed(() => {
   const temDadosAtuais = store.income > 0 || store.expenses.length > 0;
 
   const temRelatorios = store.reports && store.reports.length > 0;
-  
+
   return temDadosAtuais || temRelatorios;
 });
 
 const dadosParaExibir = computed(() => {
   const temDadosAtuais = store.income > 0 || store.expenses.length > 0;
-  
+
   if (temDadosAtuais) {
     return {
       income: store.income,
       expenses: store.expenses,
-      fonte: 'atual'
+      fonte: "atual",
     };
   } else if (store.reports && store.reports.length > 0) {
     const ultimoRelatorio = store.reports[store.reports.length - 1];
@@ -179,17 +223,20 @@ const dadosParaExibir = computed(() => {
       return {
         income: ultimoRelatorio.data.income,
         expenses: ultimoRelatorio.data.expenses,
-        fonte: 'relatorio',
-        nomeRelatorio: ultimoRelatorio.name
+        fonte: "relatorio",
+        nomeRelatorio: ultimoRelatorio.name,
       };
     }
   }
-  
-  return { income: 0, expenses: [], fonte: 'nenhum' };
+
+  return { income: 0, expenses: [], fonte: "nenhum" };
 });
 
 const totalGastos = computed(() => {
-  return dadosParaExibir.value.expenses.reduce((sum: number, expense: any) => sum + expense.value, 0);
+  return dadosParaExibir.value.expenses.reduce(
+    (sum: number, expense: any) => sum + expense.value,
+    0,
+  );
 });
 
 const saldoCalculado = computed(() => {
@@ -201,142 +248,144 @@ const percentualGasto = computed(() => {
   return Math.round((totalGastos.value / dadosParaExibir.value.income) * 100);
 });
 
-
 const pieChartOption = computed(() => {
   const isDark = uiStore.dark;
-  const textColor = isDark ? '#fff' : '#000000';
-  
-  const gastosAgrupados = dadosParaExibir.value.expenses.reduce((acc: any, expense: any) => {
-    const categoria = expense.category || 'Outros';
-    if (acc[categoria]) {
-      acc[categoria] += expense.value;
-    } else {
-      acc[categoria] = expense.value;
-    }
-    return acc;
-  }, {});
-  
-  // Converte o objeto agrupado em array para o gráfico
-  const dadosGrafico = Object.entries(gastosAgrupados).map(([categoria, valor]) => ({
-    value: valor,
-    name: categoria
-  }));
-  
+  const textColor = isDark ? "#fff" : "#000000";
+
+  const gastosAgrupados = dadosParaExibir.value.expenses.reduce(
+    (acc: any, expense: any) => {
+      const categoria = expense.category || "Outros";
+      if (acc[categoria]) {
+        acc[categoria] += expense.value;
+      } else {
+        acc[categoria] = expense.value;
+      }
+      return acc;
+    },
+    {},
+  );
+
+  const dadosGrafico = Object.entries(gastosAgrupados).map(
+    ([categoria, valor]) => ({
+      value: valor,
+      name: categoria,
+    }),
+  );
+
   return {
     title: {
-      text: 'Gastos por Categoria',
-      left: 'center',
+      text: "Gastos por Categoria",
+      left: "center",
       textStyle: {
-        color: textColor
-      }
+        color: textColor,
+      },
     },
     tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: R$ {c} ({d}%)'
+      trigger: "item",
+      formatter: "{a} <br/>{b}: R$ {c} ({d}%)",
     },
     legend: {
-      orient: 'vertical',
-      left: 'left',
+      orient: "vertical",
+      left: "left",
       textStyle: {
-        color: textColor
-      }
+        color: textColor,
+      },
     },
     series: [
       {
-        name: 'Gastos',
-        type: 'pie',
-        radius: '50%',
+        name: "Gastos",
+        type: "pie",
+        radius: "50%",
         data: dadosGrafico,
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
             shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)'
-          }
-        }
-      }
-    ]
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+        },
+      },
+    ],
   };
 });
 
-
 const barChartOption = computed(() => {
   const isDark = uiStore.dark;
-  const textColor = isDark ? '#ffffff' : '#000000';
-  const gridLineColor = isDark ? '#444444' : '#e6e6e6';
-  
+  const textColor = isDark ? "#ffffff" : "#000000";
+  const gridLineColor = isDark ? "#444444" : "#e6e6e6";
+
   return {
     title: {
-      text: 'Renda vs Gastos',
-      left: 'center',
+      text: "Renda vs Gastos",
+      left: "center",
       textStyle: {
-        color: textColor
-      }
+        color: textColor,
+      },
     },
     tooltip: {
-      trigger: 'axis',
+      trigger: "axis",
       axisPointer: {
-        type: 'shadow'
+        type: "shadow",
       },
-      formatter: 'R$ {c}'
+      formatter: "R$ {c}",
     },
     grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
     },
     xAxis: {
-      type: 'category',
-      data: ['Renda', 'Gastos', 'Saldo'],
+      type: "category",
+      data: ["Renda", "Gastos", "Saldo"],
       axisLabel: {
-        color: textColor
+        color: textColor,
       },
       axisLine: {
         lineStyle: {
-          color: textColor
-        }
-      }
+          color: textColor,
+        },
+      },
     },
     yAxis: {
-      type: 'value',
+      type: "value",
       axisLabel: {
-        formatter: 'R$ {value}',
-        color: textColor
+        formatter: "R$ {value}",
+        color: textColor,
       },
       axisLine: {
         lineStyle: {
-          color: textColor
-        }
+          color: textColor,
+        },
       },
       splitLine: {
         lineStyle: {
-          color: gridLineColor
-        }
-      }
+          color: gridLineColor,
+        },
+      },
     },
     series: [
       {
-        name: 'Valor',
-        type: 'bar',
+        name: "Valor",
+        type: "bar",
         data: [
           {
             value: dadosParaExibir.value.income,
-            itemStyle: { color: '#21ba45' }
+            itemStyle: { color: "#21ba45" },
           },
           {
             value: totalGastos.value,
-            itemStyle: { color: '#f44336' }
+            itemStyle: { color: "#f44336" },
           },
           {
             value: saldoCalculado.value,
-            itemStyle: { 
-              color: saldoCalculado.value >= 0 ? '#21ba45' : '#f44336' 
-            }
-          }
-        ]
-      }
-    ]
+            itemStyle: {
+              color: saldoCalculado.value >= 0 ? "#21ba45" : "#f44336",
+            },
+          },
+        ],
+      },
+    ],
   };
 });
 
@@ -345,42 +394,52 @@ onMounted(() => {
   uiStore.load($q);
 });
 
-watch(() => uiStore.dark, () => {
-}, { immediate: true });
+watch(
+  () => uiStore.dark,
+  () => {},
+  { immediate: true },
+);
 
 async function gerarPDF() {
   try {
-    const { jsPDF } = await import('jspdf');
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
-    doc.setFont('helvetica', 'bold');
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text('Dashboard Financeiro', 20, 30);
+    doc.text("Dashboard Financeiro", 20, 30);
 
-    doc.setFont('helvetica', 'normal');
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    if (dadosParaExibir.value.fonte === 'relatorio' && dadosParaExibir.value.nomeRelatorio) {
+    if (
+      dadosParaExibir.value.fonte === "relatorio" &&
+      dadosParaExibir.value.nomeRelatorio
+    ) {
       doc.text(`Relatório: ${dadosParaExibir.value.nomeRelatorio}`, 20, 45);
     }
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 55);
+    doc.text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 20, 55);
 
-    doc.setFont('helvetica', 'bold');
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text('Resumo Financeiro', 20, 75);
+    doc.text("Resumo Financeiro", 20, 75);
 
-    doc.setFont('helvetica', 'normal');
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.text(`Renda: ${numberToReal(dadosParaExibir.value.income)}`, 20, 90);
     doc.text(`Total de Gastos: ${numberToReal(totalGastos.value)}`, 20, 100);
-    doc.setTextColor(saldoCalculado.value >= 0 ? 0 : 255, saldoCalculado.value >= 0 ? 128 : 0, 0);
+    doc.setTextColor(
+      saldoCalculado.value >= 0 ? 0 : 255,
+      saldoCalculado.value >= 0 ? 128 : 0,
+      0,
+    );
     doc.text(`Saldo: ${numberToReal(saldoCalculado.value)}`, 20, 110);
     doc.setTextColor(0, 0, 0);
     doc.text(`% da Renda Gasta: ${percentualGasto.value} %`, 20, 120);
 
-    doc.setFont('helvetica', 'bold');
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
-    doc.text('Gastos Detalhados', 20, 135);
-    doc.setFont('helvetica', 'normal');
+    doc.text("Gastos Detalhados", 20, 135);
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
     let yPosition = 145;
     if (dadosParaExibir.value.expenses.length > 0) {
@@ -389,13 +448,13 @@ async function gerarPDF() {
           doc.addPage();
           yPosition = 20;
         }
-        const categoria = expense.category ? ` (${expense.category})` : '';
+        const categoria = expense.category ? ` (${expense.category})` : "";
         doc.text(`${index + 1}. ${expense.name}${categoria}`, 25, yPosition);
         doc.text(`${numberToReal(expense.value)}`, 160, yPosition);
         yPosition += 10;
       });
     } else {
-      doc.text('Nenhum gasto informado', 25, yPosition);
+      doc.text("Nenhum gasto informado", 25, yPosition);
       yPosition += 10;
     }
 
@@ -404,63 +463,70 @@ async function gerarPDF() {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
-      doc.text('Gerado pelo Sistema de Controle Financeiro', 20, 290);
+      doc.text("Gerado pelo Sistema de Controle Financeiro", 20, 290);
       doc.text(`Página ${i} de ${pageCount}`, 160, 290);
     }
 
-    const fileName = dadosParaExibir.value.fonte === 'relatorio' && dadosParaExibir.value.nomeRelatorio
-      ? `${dadosParaExibir.value.nomeRelatorio.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
-      : `${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName =
+      dadosParaExibir.value.fonte === "relatorio" &&
+      dadosParaExibir.value.nomeRelatorio
+        ? `${dadosParaExibir.value.nomeRelatorio.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`
+        : `${new Date().toISOString().split("T")[0]}.pdf`;
     doc.save(fileName);
 
     $q.notify({
-      type: 'positive',
-      message: 'PDF gerado com sucesso!',
-      position: 'top'
+      type: "positive",
+      message: "PDF gerado com sucesso!",
+      position: "top",
     });
   } catch (error) {
-    console.error('Erro ao gerar PDF:', error);
+    console.error("Erro ao gerar PDF:", error);
     $q.notify({
-      type: 'negative',
-      message: 'Erro ao gerar PDF. Tente novamente.',
-      position: 'top'
+      type: "negative",
+      message: "Erro ao gerar PDF. Tente novamente.",
+      position: "top",
     });
   }
 }
 
 function exportarCSV() {
   if (!temDados.value) return;
-  
+
   const dados = dadosParaExibir.value;
   const csvContent = [
-    ['Tipo', 'Descrição', 'Valor'],
-    ['Renda', 'Renda Mensal', numberToReal(dados.income)],
-    ...dados.expenses.map((expense: any) => ['Gasto', expense.name, numberToReal(expense.value)]),
-    ['', 'Total Gastos', numberToReal(totalGastos.value)],
-    ['', 'Saldo', numberToReal(saldoCalculado.value)]
+    ["Tipo", "Descrição", "Valor"],
+    ["Renda", "Renda Mensal", numberToReal(dados.income)],
+    ...dados.expenses.map((expense: any) => [
+      "Gasto",
+      expense.name,
+      numberToReal(expense.value),
+    ]),
+    ["", "Total Gastos", numberToReal(totalGastos.value)],
+    ["", "Saldo", numberToReal(saldoCalculado.value)],
   ]
-  .map(row => row.join(','))
-  .join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
+    .map((row) => row.join(","))
+    .join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
   const url = URL.createObjectURL(blob);
-  link.setAttribute('href', url);
-  
-  const filename = dados.fonte === 'relatorio' 
-    ? `${dados.nomeRelatorio?.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
-    : `${new Date().toISOString().split('T')[0]}.csv`;
-    
-  link.setAttribute('download', filename);
-  link.style.visibility = 'hidden';
+  link.setAttribute("href", url);
+
+  const filename =
+    dados.fonte === "relatorio"
+      ? `${dados.nomeRelatorio?.replace(/[^a-zA-Z0-9]/g, "_")}_${new Date().toISOString().split("T")[0]}.csv`
+      : `${new Date().toISOString().split("T")[0]}.csv`;
+
+  link.setAttribute("download", filename);
+  link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
+
   $q.notify({
-    type: 'positive',
-    message: 'Arquivo CSV exportado com sucesso!',
-    position: 'top'
+    type: "positive",
+    message: "Arquivo CSV exportado com sucesso!",
+    position: "top",
   });
 }
 </script>

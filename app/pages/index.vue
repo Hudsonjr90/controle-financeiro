@@ -26,7 +26,7 @@
           :text-color="uiStore.dark ? 'text-white' : 'text-dark'"
           unelevated
           outline
-          to="/controle"
+          to="/control"
           class="q-px-xl"
         >
           <q-icon name="fa-solid fa-plus-circle" :color="uiStore.dark ? 'white' : 'primary'" class="q-mr-sm" />
